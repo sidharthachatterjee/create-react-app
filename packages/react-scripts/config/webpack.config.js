@@ -100,19 +100,24 @@ module.exports = function(webpackEnv) {
           // Necessary for external CSS imports to work
           // https://github.com/facebook/create-react-app/issues/2677
           ident: 'postcss',
-          plugins: () => [
-            require('tailwindcss')(paths.tailwindJs),
-            require('postcss-flexbugs-fixes'),
-            require('postcss-preset-env')({
-              autoprefixer: {
-                flexbox: 'no-2009',
-              },
-              stage: 3,
-            }),
-            require('@fullhuman/postcss-purgecss')({
-              content: [paths.appHtml, ...glob.sync(`${paths.appSrc}/*`)],
-            }),
-          ],
+          plugins: () =>
+            [
+              require('tailwindcss')(paths.tailwindJs),
+              require('postcss-flexbugs-fixes'),
+              require('postcss-preset-env')({
+                autoprefixer: {
+                  flexbox: 'no-2009',
+                },
+                stage: 3,
+              }),
+              isEnvProduction &&
+                require('@fullhuman/postcss-purgecss')({
+                  content: [
+                    paths.appHtml,
+                    ...glob.sync(`${paths.appSrc}/**/*.js`),
+                  ],
+                }),
+            ].filter(Boolean),
           sourceMap: isEnvProduction && shouldUseSourceMap,
         },
       },
